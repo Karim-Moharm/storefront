@@ -1,7 +1,16 @@
 <html>
 
 <body>
-  <h1>hello {{ name }}</h1>
+  <h1>hello {{ user }}</h1>
+
+  <ul>
+    {% for promotion in promotions %}
+    <li>
+      {{ promotion.description }} with discount - {{ promotion.discount }}
+    </li>
+    {% endfor %}
+
+  </ul>
 </body>
 
 </html>
