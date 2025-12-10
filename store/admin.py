@@ -1,5 +1,7 @@
 from django.contrib import admin
+from django.db.models import Count
 from . import models
+from django.utils.html import format_html
 
 
 @admin.register(models.Customer)
@@ -20,7 +22,10 @@ class ProductAdmin(admin.ModelAdmin):
         "price",
         "inventory_status",
         "collection_title",
+        "promotion_count",
     ]
+
+    list_display_links = ["title", "collection_title"]
 
     list_select_related = ["collection"]
 
@@ -31,18 +36,34 @@ class ProductAdmin(admin.ModelAdmin):
         return "FILL"
 
     def collection_title(self, product):
-        return product.collection.title
+        return format_html(
+            "<a href='http://127.0.0.1:8000/admin/store/collection/'>{}</a>",
+            product.collection.title,
+        )
+
+    def promotion_count(self, product):
+        return product.promotion_count
+
+    def get_queryset(self, request):
+        return (
+            super().get_queryset(request).annotate(promotion_count=Count("promotions"))
+        )
+
+    """another method with one function
+    def promotion_count(self, product):
+        product.promotions.count()
+    """
 
 
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ["title", "product_count"]
 
+    @admin.display(ordering="-product_count")
     def product_count(self, collection):
-        """
-        product_set is the reverse FK, django automatically creats it
-        returns all products that point to this collection
-        """
-        return collection.product_set.count()
+        return collection.product_count
 
-    product_count.short_description = "Products"
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(product_count=Count("product"))
+
+    # product_count.short_description = "Products"
