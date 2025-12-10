@@ -16,8 +16,8 @@ def sayHello(request):
 
     # Collection.objects.create(title="Phones", featured_product_id=None)
     collection = Collection()
-    collection.title = "Phones"
-    collection.featured_product = Product(pk=None)
+    collection.title = "Colthes"
+    collection.featured_product_id = None
     collection.save()
     return render(
         request,

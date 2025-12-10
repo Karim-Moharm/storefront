@@ -30,7 +30,7 @@ class Product(models.Model):
     description = models.TextField()
     slug = models.SlugField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    invertory = models.IntegerField()
+    inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     # PROTECT -> Prevents deleting the parent (Collection) if children (Product) exist .
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
@@ -60,7 +60,7 @@ class Customer(models.Model):
     )
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name} {self.membership}"
 
     class Meta:
         ordering = ["first_name"]
