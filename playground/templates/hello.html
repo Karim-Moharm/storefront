@@ -4,9 +4,9 @@
   <h1>hello {{ user }}</h1>
 
   <ul>
-    {% for promotion in promotions %}
+    {% for full_name in customer_name %}
     <li>
-      {{ promotion.description }} with discount - {{ promotion.discount }}
+      {{ full_name.full_name }}
     </li>
     {% endfor %}
 

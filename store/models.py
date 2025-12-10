@@ -33,6 +33,12 @@ class Product(models.Model):
 
 
 class Customer(models.Model):
+    MEMBERSHIP = [
+        ("B", "Bronze"),
+        ("S", "Silver"),
+        ("G", "Gold"),
+    ]
+
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
@@ -40,16 +46,13 @@ class Customer(models.Model):
     birth_date = models.DateField(null=True, blank=True)
     membership = models.CharField(
         max_length=1,
-        choices=[
-            ("B", "Bronze"),
-            ("S", "Silver"),
-            ("G", "Gold"),
-        ],
+        choices=MEMBERSHIP,
         default="B",
     )
 
 
 class Order(models.Model):
+    # auto_now_add -> first time created
     placed_at = models.DateTimeField(auto_now_add=True)
     payment_status = models.CharField(
         max_length=1,
@@ -62,13 +65,14 @@ class Order(models.Model):
     # PROECT -> because you don't want to deleted an order from the data base even if the customr is deleted
     # but it will prevent deleting users who have order?????
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
-    """
+
+    """the correct????????
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     """
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.PROTECT)
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveSmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
