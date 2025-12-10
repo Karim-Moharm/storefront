@@ -50,6 +50,9 @@ class Customer(models.Model):
         default="B",
     )
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
 
 class Order(models.Model):
     # auto_now_add -> first time created
