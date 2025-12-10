@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db.models import Count
 from . import models
 from django.utils.html import format_html
+from django.urls import reverse
 
 
 @admin.register(models.Customer)
@@ -36,8 +37,11 @@ class ProductAdmin(admin.ModelAdmin):
         return "FILL"
 
     def collection_title(self, product):
+        #  reverse(admin:appname_change)
+        url = reverse(f"admin:store_collection_change", args=[product.collection.id])
         return format_html(
-            "<a href='http://127.0.0.1:8000/admin/store/collection/'>{}</a>",
+            "<a href='{}'>{}</a>",
+            url,
             product.collection.title,
         )
 
