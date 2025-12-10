@@ -6,4 +6,10 @@ from .models import Product, Promotion, Collection, Customer
 admin.site.register(Product)
 admin.site.register(Promotion)
 admin.site.register(Collection)
-admin.site.register(Customer)
+
+
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ["first_name", "last_name", "email", "membership"]
+
+
+admin.site.register(Customer, CustomerAdmin)

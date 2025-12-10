@@ -7,6 +7,12 @@ class Collection(models.Model):
         "Product", on_delete=models.SET_NULL, null=True, related_name="+"
     )
 
+    def __str__(self) -> str:
+        return f"{self.title}"
+
+    class Meta:
+        ordering = ["title"]
+
 
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
@@ -14,6 +20,9 @@ class Promotion(models.Model):
 
     # def __str__(self):
     #     return f"{self.description} - {self.discount}"
+
+    def __str__(self):
+        return f"{self.description}"
 
 
 class Product(models.Model):
@@ -24,7 +33,7 @@ class Product(models.Model):
     invertory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     # PROTECT -> Prevents deleting the parent (Collection) if children (Product) exist .
-    Collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
+    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
     promotions = models.ManyToManyField(Promotion)
 
     class Meta:
@@ -52,6 +61,9 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        ordering = ["first_name"]
 
 
 class Order(models.Model):
