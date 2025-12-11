@@ -5,10 +5,23 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin
+from rest_framework.generics import ListCreateAPIView
 from .models import Product, Collection
 from .serializers import ProductSerializer, CollectionSerializer
+from rest_framework import generics
 
 
+# Generic Views
+class ProductListGen(generics.ListCreateAPIView):
+    # queryset and serializer
+    def get_queryset(self):
+        return Product.objects.select_related("collection").all()
+
+    def get_serializer(self, *args, **kwargs):
+        return ProductSerializer(*args, **kwargs)
+
+
+# class APiView
 class ProductList(APIView):
     def get(self, request):
         queryset = Product.objects.select_related("collection").all()
@@ -54,6 +67,19 @@ class ProductDetails(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# generic view
+class CollectionListGen(generics.ListCreateAPIView):
+    queryset = Collection.objects.all()
+    serializer_class = CollectionSerializer
+
+
+# generic view for put, delete
+class CollectionDetailsGen(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Collection.objects.all()
+    serializer_class = CollectionSerializer
+
+
+# function based view
 @api_view()
 def collection_details(request, id):
     collection = get_object_or_404(Collection, pk=id)
