@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 
 class Collection(models.Model):
@@ -27,14 +28,16 @@ class Promotion(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     slug = models.SlugField()
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, validators=[MinValueValidator(1)]
+    )
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     # PROTECT -> Prevents deleting the parent (Collection) if children (Product) exist .
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
-    promotions = models.ManyToManyField(Promotion)
+    promotions = models.ManyToManyField(Promotion, blank=True)
 
     class Meta:
         verbose_name = "Store Product - from Meta"
@@ -91,6 +94,9 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveSmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.order.customer.first_name} {self.product} {self.quantity}"
 
 
 class Address(models.Model):
