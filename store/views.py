@@ -21,6 +21,23 @@ class ProductListGen(generics.ListCreateAPIView):
         return ProductSerializer(*args, **kwargs)
 
 
+# Generic View
+class ProductDetailsGen(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    # override the delete method
+    def delete(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        if product.orderitem_set.count() > 0:
+            return Response(
+                {"error": "product can not be deleted as it associated with an order"},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+        product.delete()
+        return Response("Deleted", status=status.HTTP_204_NO_CONTENT)
+
+
 # class APiView
 class ProductList(APIView):
     def get(self, request):
@@ -77,6 +94,19 @@ class CollectionListGen(generics.ListCreateAPIView):
 class CollectionDetailsGen(generics.RetrieveUpdateDestroyAPIView):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
+
+    # override delete because we have a context here
+    # incase if the collection u want to delete have products
+    # the api must prevet u from deleting it
+    def delete(self, request, pk):
+        collection = get_object_or_404(pk=pk)
+        if collection.product_set.count() > 0:
+            return Response(
+                {"error": "collection have some product, so can't be deleted"},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+        collection.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # function based view
