@@ -2,18 +2,20 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from .models import Product, Collection
 from .serializers import ProductSerializer, CollectionSerializer
-from rest_framework import status
 
 
-@api_view(["GET", "POST"])
-def product_list(request):
-    if request.method == "GET":
+class ProductList(APIView):
+    def get(self, request):
         queryset = Product.objects.select_related("collection").all()
         serializer = ProductSerializer(queryset, many=True)
         return Response(serializer.data)
-    elif request.method == "POST":
+
+    def post(self, request):
         serializer = ProductSerializer(
             data=request.data
         )  # requets the data in serializer var
@@ -26,18 +28,21 @@ def product_list(request):
         )
 
 
-@api_view(["GET", "PUT", "DELETE"])
-def product_details(request, id):
-    product = get_object_or_404(Product, pk=id)  # object
-    if request.method == "GET":
+class ProductDetails(APIView):
+    def get(self, request, id):
+        product = get_object_or_404(Product, pk=id)
         serializer = ProductSerializer(product)  # python dict
         return Response(serializer.data)
-    elif request.method == "PUT":
+
+    def put(self, request, id):
+        product = get_object_or_404(Product, pk=id)
         serializer = ProductSerializer(product, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(f"the product {serializer.data['title']} was update")
-    elif request.method == "DELETE":
+
+    def delete(self, request, id):
+        product = get_object_or_404(Product, pk=id)
         # check first if there is an order item for that product
         # we will use orderitem_set -> django create it automatically since the orderitem has a product foreign key
         if product.orderitem_set.count() > 0:
