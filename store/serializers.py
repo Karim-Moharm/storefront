@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Collection, Order
+from .models import Product, Collection, Order, Review
 from decimal import Decimal
 
 
@@ -38,3 +38,15 @@ class OderSerilizer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ["id", "placed_at", "payment_status"]
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["name", "description", "created_at"]
+
+        # overwrite create method
+
+    def create(self, validated_data):
+        product_id = self.context["product_id"]
+        return Review.objects.create(product_id=product_id, **validated_data)
