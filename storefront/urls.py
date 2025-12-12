@@ -26,4 +26,5 @@ urlpatterns = [
     path("playground/", include("playground.urls")),
     # path = ('__debu__/', include(debug_toolbar.urls)),
     path("store/", include("store.urls")),
+    path("carts/", include("carts.urls")),
 ]

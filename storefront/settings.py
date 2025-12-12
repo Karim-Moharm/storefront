@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "store",
     "tags",
     "likes",
+    "carts",
     "rest_framework",
     "django_filters",
 ]
