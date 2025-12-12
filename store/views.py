@@ -6,9 +6,10 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework.generics import ListCreateAPIView
-from .models import Product, Collection
-from .serializers import ProductSerializer, CollectionSerializer
 from rest_framework import generics
+from rest_framework.viewsets import ModelViewSet
+from .models import Product, Collection, Order, OrderItem
+from .serializers import ProductSerializer, CollectionSerializer, OderSerilizer
 
 
 # Generic Views
@@ -36,6 +37,21 @@ class ProductDetailsGen(generics.RetrieveUpdateDestroyAPIView):
             )
         product.delete()
         return Response("Deleted", status=status.HTTP_204_NO_CONTENT)
+
+
+# ViewSet
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    # in viewSet we overwrite the destroy method not delete
+    def destroy(self, request, *args, **kwargs):
+        if OrderItem.objects.filter(product_id=kwargs["pk"]).count() > 0:
+            return Response(
+                {"error": "product can not be deleted as it associated with an order"},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+        return super().destroy(request, *args, **kwargs)
 
 
 # class APiView
@@ -95,7 +111,7 @@ class CollectionDetailsGen(generics.RetrieveUpdateDestroyAPIView):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
 
-    # override delete because we have a context here
+    # override delete because we have a custom logic here
     # incase if the collection u want to delete have products
     # the api must prevet u from deleting it
     def delete(self, request, pk):
@@ -130,3 +146,9 @@ def collection_list(request):
         return Response(
             f"{serializer.data['title']} was created", status=status.HTTP_201_CREATED
         )
+
+
+# Viewset
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OderSerilizer
