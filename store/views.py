@@ -46,8 +46,18 @@ class ProductDetailsGen(generics.RetrieveUpdateDestroyAPIView):
 
 # ViewSet
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    # applying filters for query parameter
+    def get_queryset(self):
+        """
+        ex: /store/products/?collection_id=5
+        """
+        # get value of collection_id from url param
+        collection_id = self.request.query_params.get("collection_id")
+        if collection_id:
+            return Product.objects.filter(collection_id=collection_id)
+        return Product.objects.all()
 
     # in viewSet we overwrite the destroy method not delete
     def destroy(self, request, *args, **kwargs):
