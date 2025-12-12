@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,6 +14,10 @@ from .serializers import (
     OderSerilizer,
     ReviewSerializer,
 )
+from django_filters.rest_framework import DjangoFilterBackend
+from .filter import ProductFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
 
 
 # Generic Views
@@ -46,18 +49,15 @@ class ProductDetailsGen(generics.RetrieveUpdateDestroyAPIView):
 
 # ViewSet
 class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
-    # applying filters for query parameter
-    def get_queryset(self):
-        """
-        ex: /store/products/?collection_id=5
-        """
-        # get value of collection_id from url param
-        collection_id = self.request.query_params.get("collection_id")
-        if collection_id:
-            return Product.objects.filter(collection_id=collection_id)
-        return Product.objects.all()
+    # generic filters
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_class = ProductFilter
+    # search
+    search_fields = ["title", "description"]
+    # pagination
+    pagination_class = PageNumberPagination
 
     # in viewSet we overwrite the destroy method not delete
     def destroy(self, request, *args, **kwargs):
