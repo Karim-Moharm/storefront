@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from .models import Cart, CartItem
-from .serializers import CartSerializer, CartItemSerializer
+from .serializers import CartSerializer, CartItemSerializer, UpdateCartItemSerializer
 from rest_framework.mixins import (
     CreateModelMixin,
     RetrieveModelMixin,
@@ -20,6 +20,11 @@ class cartViewSet(
     serializer_class = CartSerializer
 
 
-class CartItemViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+class CartItemViewSet(ModelViewSet):
+    http_method_names = ["get", "post", "delete", "patch"]
     queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == "PATCH":
+            return UpdateCartItemSerializer
+        return CartItemSerializer

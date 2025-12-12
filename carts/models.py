@@ -1,6 +1,7 @@
 from django.db import models
 from store.models import Product
 from uuid import uuid4
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 
@@ -12,7 +13,7 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cartitem")
-    quantity = models.PositiveSmallIntegerField()
+    quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
     # both cart and product can have many cart item
     # you can add as many items in the cat of one product
     # diffrence between cartItem and product
