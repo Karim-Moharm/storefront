@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "playground",
+    "users",
     "store",
     "tags",
     "likes",
@@ -141,3 +142,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {"COERCE_DECIMAL_TO_STRING": False, "PAGE_SIZE": 3}
+
+
+AUTH_USER_MODEL = "users.User"

@@ -8,7 +8,7 @@ from django.urls import reverse
 @admin.register(models.Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ["first_name", "last_name", "email", "membership"]
-    list_editable = ["membership", "last_name", "first_name"]
+    list_editable = ["membership"]
     list_per_page = 10
     # if you want to edit first_name you must add
     # list_display_link = ["field not in list_d=editable"]

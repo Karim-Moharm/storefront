@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.conf import settings
+from django.contrib import admin
 
 
 class Collection(models.Model):
@@ -50,10 +52,6 @@ class Customer(models.Model):
         ("S", "Silver"),
         ("G", "Gold"),
     ]
-
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
     birth_date = models.DateField(null=True, blank=True)
     membership = models.CharField(
@@ -61,12 +59,24 @@ class Customer(models.Model):
         choices=MEMBERSHIP,
         default="B",
     )
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    @admin.display(ordering="user__first_name")
+    def first_name(self):
+        return self.user.first_name
+
+    @admin.display(ordering="user__last_name")
+    def last_name(self):
+        return self.user.last_name
+
+    def email(self):
+        return self.user.email
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} {self.membership}"
+        return f"{self.user.first_name} {self.user.last_name} {self.membership}"
 
     class Meta:
-        ordering = ["first_name"]
+        ordering = ["user__first_name"]
 
 
 class Order(models.Model):
