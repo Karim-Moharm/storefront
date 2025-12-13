@@ -27,4 +27,6 @@ urlpatterns = [
     # path = ('__debu__/', include(debug_toolbar.urls)),
     path("store/", include("store.urls")),
     path("carts/", include("carts.urls")),
+    path("auth/", include("djoser.urls")),
+    path("auth/", include("djoser.urls.jwt")),
 ]

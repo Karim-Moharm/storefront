@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "carts",
     "rest_framework",
     "django_filters",
+    "djoser",
 ]
 
 
@@ -141,7 +142,19 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-REST_FRAMEWORK = {"COERCE_DECIMAL_TO_STRING": False, "PAGE_SIZE": 3}
+REST_FRAMEWORK = {
+    "COERCE_DECIMAL_TO_STRING": False,
+    "PAGE_SIZE": 3,
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
 
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("JWT",),
+}
+
+
+DJOSER = {"SERIALIZERS": {"user_create": "users.serializers.UserCreateSerializer"}}
 
 AUTH_USER_MODEL = "users.User"
