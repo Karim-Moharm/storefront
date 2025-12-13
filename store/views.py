@@ -8,7 +8,7 @@ from rest_framework.mixins import (
     CreateModelMixin,
     DestroyModelMixin,
 )
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import generics
@@ -25,6 +25,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filter import ProductFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
+from .permissions import IsAdminOrReadOnly
 
 
 # Generic Views
@@ -65,6 +66,7 @@ class ProductViewSet(ModelViewSet):
     search_fields = ["title", "description"]
     # pagination
     pagination_class = PageNumberPagination
+    permission_classes = [IsAdminOrReadOnly]
 
     # in viewSet we overwrite the destroy method not delete
     def destroy(self, request, *args, **kwargs):
@@ -187,14 +189,12 @@ class ReviewViewSet(ModelViewSet):
         return {"product_id": self.kwargs["product_pk"]}
 
 
-class CustomerViewSet(
-    RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, GenericViewSet
-):
+class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
-    @action(detail=False, methods=["GET", "PUT"])
+    @action(detail=False, methods=["GET", "PUT"], permission_classes=[IsAuthenticated])
     def me(self, request):
         (customer, created) = Customer.objects.get_or_create(user_id=request.user.id)
         if request.method == "GET":
