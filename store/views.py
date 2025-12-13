@@ -20,6 +20,7 @@ from .serializers import (
     OderSerilizer,
     ReviewSerializer,
     CustomerSerializer,
+    CreateOrderSerializer,
 )
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import ProductFilter
@@ -175,7 +176,15 @@ def collection_list(request):
 # Viewset
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
-    serializer_class = OderSerilizer
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return CreateOrderSerializer
+        return OderSerilizer
+
+    def get_serializer_context(self):
+        return {"user_id": self.request.user.id}
 
 
 class ReviewViewSet(ModelViewSet):
