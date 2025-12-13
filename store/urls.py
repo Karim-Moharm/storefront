@@ -3,12 +3,13 @@ from . import views
 
 # from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
-from .views import OrderViewSet, ProductViewSet, ReviewViewSet
+from .views import OrderViewSet, ProductViewSet, ReviewViewSet, CustomerViewSet
 
 
 router = routers.DefaultRouter()
 router.register("orderview", OrderViewSet, basename="orders")
 router.register("productview", ProductViewSet, basename="products")  # parent router
+router.register("customers", CustomerViewSet)
 
 # netsted router ->  /domains/{domain_pk}/nameservers/{pk}
 # for us ->     /productview/product_id/reviews/review_id
