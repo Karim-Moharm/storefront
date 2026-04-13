@@ -5,6 +5,30 @@ from carts.models import Cart, CartItem
 from django.db import transaction
 
 
+
+class CollectionTestSerializer(serializers.ModelSerializer):
+    num_of_products = serializers.SerializerMethodField(method_name='products_count')
+    class Meta:
+        model = Collection
+        fields = ['id', 'title', 'featured_product', "num_of_products"]
+
+    def products_count(self, collection: Collection):
+        return collection.product_set.count()
+
+
+class ProductTestSerializer(serializers.ModelSerializer):
+    price_with_tax = serializers.SerializerMethodField('calc_tax')
+
+    def calc_tax(self, product: Product):
+        return product.price * Decimal(1.1)
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'description', 'price', 'price_with_tax', 'inventory', 'collection']
+
+    def create(self, validated_data):
+        return super().create(validated_data)
+
+
 class CollectionSerializer(serializers.ModelSerializer):
 
     class Meta:

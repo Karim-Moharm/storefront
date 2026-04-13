@@ -11,7 +11,7 @@ class Collection(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.title}"
+        return self.title
 
     class Meta:
         ordering = ["title"]
@@ -44,6 +44,8 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Store Product - from Meta"
         verbose_name_plural = "store products - from Meta"
+
+
 
 
 class Customer(models.Model):
@@ -99,7 +101,7 @@ class Order(models.Model):
     """
 
 
-class OrderItem(models.Model):
+class OrderItem(models.Model): 
     order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="items")
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveSmallIntegerField()

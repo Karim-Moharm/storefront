@@ -21,12 +21,81 @@ from .serializers import (
     ReviewSerializer,
     CustomerSerializer,
     CreateOrderSerializer,
+    ProductTestSerializer,
+    CollectionTestSerializer
 )
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import ProductFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from .permissions import IsAdminOrReadOnly
+from .services import StoreService
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def product_detail(request, id):
+    product = get_object_or_404(Product, id=id)
+    if request.method == 'GET':
+        serializer = ProductTestSerializer(product)
+        return Response(serializer.data)
+    
+    elif request.method == 'PUT':
+        serializer = ProductTestSerializer(product, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
+    elif request.method == 'DELETE':
+        StoreService.delete_product(product)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET', 'POST'])
+def products(request):
+    if request.method == "GET":
+        products = Product.objects.select_related('collection').all()[:10]
+        serializer = ProductTestSerializer(products, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    elif request.method == "POST":
+        serializer = ProductTestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+@api_view(["GET", "PUT", "DELETE"])
+def collection_details(request, pk):
+    collection = get_object_or_404(Collection, pk=pk)
+    if request.method == "GET":
+        serializer = CollectionTestSerializer(collection)
+        return Response(serializer.data)
+    
+    elif request.method == "PUT":
+        serializer = CollectionTestSerializer(collection, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
+    elif request.method == "DELETE":
+        StoreService.delete_collection(collection)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET", "POST"])
+def collections(request):
+    if request.method == "GET":
+        queryset = Collection.objects.all().order_by('id')
+        serializer = CollectionTestSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == "POST":
+        serializer = CollectionTestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 
 # Generic Views
@@ -149,13 +218,6 @@ class CollectionDetailsGen(generics.RetrieveUpdateDestroyAPIView):
         collection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-# function based view
-@api_view()
-def collection_details(request, id):
-    collection = get_object_or_404(Collection, pk=id)
-    serializer = CollectionSerializer(collection)
-    return Response(serializer.data)
 
 
 @api_view(["GET", "POST"])
